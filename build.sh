@@ -2,8 +2,8 @@
 set -e
 
 # --- Konfiguration ---
-DEFAULT_MAJOR_MOODLE="4"
-PHP_VERSION_TAG="8.0"
+DEFAULT_MAJOR_MOODLE="5"
+PHP_VERSION_TAG="8.2"
 
 # --- Dynamische Abfrage der Moodle Version (Ansible Migration) ---
 echo "Frage Moodle Tags von GitHub API ab..."
@@ -65,15 +65,35 @@ docker build \
 # Push & Tagging Funktion
 tag_and_push() {
   local TAG=$1
-  docker tag "${IMAGE_NAME}:${COMMIT_HASH}" "${IMAGE_NAME}:${TAG}"
+  local FULL_IMAGE_W_TAG="${IMAGE_NAME}:${TAG}"
+  
+  echo "=> Tagging: ${FULL_IMAGE_W_TAG}"
+  docker tag "${IMAGE_NAME}:${COMMIT_HASH}" "${FULL_IMAGE_W_TAG}"
+  
   if [ "$CI" == "true" ]; then
-    docker push "${IMAGE_NAME}:${TAG}"
+    echo "=> Pushing: ${FULL_IMAGE_W_TAG} ..."
+    docker push "${FULL_IMAGE_W_TAG}"
   fi
 }
 
 if [ "$CI" == "true" ]; then
+  echo "--- Distribution: Pushing to Registry ---"
+  
+  # Push den Commit-Hash Tag zuerst
+  echo "=> Pushing base hash tag: ${IMAGE_NAME}:${COMMIT_HASH}"
   docker push "${IMAGE_NAME}:${COMMIT_HASH}"
+  
+  # Erzeuge und pushe die weiteren Tags
   tag_and_push "latest"
-  # Erzeugt einen Tag wie: ghcr.io/user/repo:v4.3.2-php8.0
+  
+  # Erzeugt einen Tag wie: ghcr.io/user/repo:v5.0.1-php8.2
   tag_and_push "${MOODLE_TAG}-php${PHP_VERSION_TAG}"
+  
+  echo "--- Fertig: Alle Images wurden erfolgreich übertragen ---"
+else
+  echo "--- Lokal: Build abgeschlossen ---"
+  echo "Erstellte Images:"
+  echo " - ${IMAGE_NAME}:${COMMIT_HASH}"
+  echo " - ${IMAGE_NAME}:latest (lokal getaggt)"
+  echo " - ${IMAGE_NAME}:${MOODLE_TAG}-php${PHP_VERSION_TAG} (lokal getaggt)"
 fi
