@@ -1,7 +1,7 @@
 services:
 
   moodle_db:
-    image: mariadb:${MARIADB_TAG:-10.6.7}
+    image: mariadb:${MARIADB_TAG:-10.11}
     restart: always
     volumes:
       - './data/db:/var/lib/mysql'
