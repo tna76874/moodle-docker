@@ -3,7 +3,7 @@ set -e
 
 # --- Konfiguration ---
 DEFAULT_MAJOR_MOODLE="5"
-PHP_VERSION_TAG="8.2"
+PHP_VERSION_TAG="8.3"
 
 # --- Dynamische Abfrage der Moodle Version (Ansible Migration) ---
 echo "Frage Moodle Tags von GitHub API ab..."
