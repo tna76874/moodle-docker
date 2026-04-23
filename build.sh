@@ -57,6 +57,7 @@ echo "--- Build & Push ---"
 docker build \
   --no-cache \
   --pull \
+  --target mysql_maria \
   --build-arg PHP_VERSION="${PHP_VERSION_TAG}" \
   -t "${IMAGE_NAME}:${COMMIT_HASH}" \
   -f build_base/dockerfiles/apache/Dockerfile \
