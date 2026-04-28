@@ -61,6 +61,17 @@ services:
       - MOODLE_EMAIL_HOST=${MOODLE_EMAIL_HOST}
       - PHP_UPLOAD_LIMIT=${UPLOAD_LIMIT:-200M}
 
+  tunnel:
+      image: cloudflare/cloudflared:latest
+      restart: always
+      command: tunnel --url http://moodle:80
+      profiles:
+        - optional-tunnel
+      logging:
+        driver: json-file
+        options:
+          max-size: "10m"
+
 
 configs:
   php_upload_limit:
